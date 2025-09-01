@@ -36,7 +36,7 @@ app.set('io', io);
 
 
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL || 'https://penrose-test-eiht.vercel.app',
   credentials: true
 };
 console.log('CORS config:', corsOptions);
