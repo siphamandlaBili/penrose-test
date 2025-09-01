@@ -113,7 +113,12 @@ function App() {
                     <h2 className="text-2xl font-bold text-[#fa5c36] mb-4">Admins cannot access the user dashboard.</h2>
                   </div>
                 ) : (
-                  <Dashboard socket={socket} userProfile={userProfile} />
+                  <Dashboard 
+                    socket={socket} 
+                    userProfile={userProfile} 
+                    setIsAuthenticated={setIsAuthenticated} 
+                    setUserProfile={setUserProfile} 
+                  />
                 )
               ) : (
                 <Navigate to="/" replace />
@@ -129,7 +134,7 @@ function App() {
             path="/admin" 
             element={
               isAuthenticated && userProfile?.isAdmin ? (
-                <AdminDashboard userProfile={userProfile} />
+                <AdminDashboard userProfile={userProfile} setIsAuthenticated={setIsAuthenticated} setUserProfile={setUserProfile} />
               ) : isAuthenticated && !userProfile?.isAdmin ? (
                 <Navigate to="/dashboard" replace />
               ) : (
