@@ -25,7 +25,7 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL || 'https://penrose-test-eiht.vercel.app',
     credentials: true,
   },
 });
@@ -34,7 +34,7 @@ app.set('io', io);
 
 // --- ✅ Updated CORS configuration ---
 const corsOptions = {
-  origin: [process.env.FRONTEND_URL, 'https://penrose-test-eiht.vercel.app'].filter(Boolean),
+  origin: [process.env.FRONTEND_URL, 'https://penrose-test-3.onrender.com'].filter(Boolean),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
