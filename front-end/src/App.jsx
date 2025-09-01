@@ -20,7 +20,7 @@ import AdminCharts from './pages/AdminCharts';
 import AdminProfile from './pages/AdminProfile';
 
 // Set up axios defaults
-axios.defaults.baseURL = 'http://localhost:3000/api';
+axios.defaults.baseURL = 'https://penrose-test.vercel.app/api';
 axios.defaults.withCredentials = true;
 
 function App() {
