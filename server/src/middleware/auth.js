@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
+  console.log('AUTH MIDDLEWARE: cookies:', req.cookies);
   const token = req.cookies.token;
 
   if (!token) {
@@ -8,9 +9,10 @@ const authMiddleware = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  req.user = decoded;
+  console.log('AUTH MIDDLEWARE: decoded user:', decoded);
+  next();
   } catch (error) {
     return res.status(401).json({ message: 'Invalid token' });
   }

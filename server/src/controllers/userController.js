@@ -6,12 +6,15 @@ const getProfile = async (req, res) => {
     const { msisdn } = req.user;
     const user = await User.findOne({ msisdn });
     if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json({
+    const profile = {
       msisdn: user.msisdn,
       memberSince: user.createdAt,
       provider: user.provider,
-      airtime: user.airtime
-    });
+      airtime: user.airtime,
+      isAdmin: user.isAdmin || false
+    };
+    console.log('API /user/profile response:', profile);
+    res.json(profile);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching user profile' });
   }

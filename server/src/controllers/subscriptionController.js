@@ -56,6 +56,8 @@ const subscribe = async (req, res) => {
       type: 'subscribe',
       subscription
     });
+    // Emit admin stats update event
+    req.app.get('io').emit('admin:statsUpdate');
 
     res.status(201).json({
       subscription,
@@ -95,6 +97,8 @@ const unsubscribe = async (req, res) => {
       subscriptionId,
       subscription
     });
+    // Emit admin stats update event
+    req.app.get('io').emit('admin:statsUpdate');
 
     res.json({ 
       message: 'Subscription cancelled successfully',

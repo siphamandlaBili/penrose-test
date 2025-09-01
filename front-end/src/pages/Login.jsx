@@ -81,7 +81,7 @@ export default function AuthForm({ setIsAuthenticated }) {
         <div className="p-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 bg-gradient-to-r from-[#fa5c36] to-orange-400 bg-clip-text">
-              VAS Portal
+              subscribie
             </h2>
             <p className="mt-2 text-sm text-gray-600">
               {tab === 'login' 

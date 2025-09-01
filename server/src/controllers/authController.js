@@ -111,9 +111,12 @@ const verifyOTP = async (req, res) => {
   // Clear used OTP
   otpStore.delete(msisdn);
 
-  // Generate JWT token
+
+  // Fetch user to get isAdmin
+  const user = await User.findOne({ msisdn });
+  // Generate JWT token with isAdmin
   const token = jwt.sign(
-    { msisdn },
+    { msisdn, isAdmin: user?.isAdmin || false },
     process.env.JWT_SECRET,
     { expiresIn: '24h' }
   );

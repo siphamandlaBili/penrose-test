@@ -45,7 +45,13 @@ export default function OTPVerification({ setIsAuthenticated }) {
       await axios.post('/auth/verify-otp', { msisdn, otp });
       sessionStorage.removeItem('msisdn');
       setIsAuthenticated(true);
-      navigate('/dashboard');
+      // Fetch user profile to check if admin
+      const { data: profile } = await axios.get('/user/profile');
+      if (profile.isAdmin) {
+        window.location.replace('/admin');
+      } else {
+        window.location.replace('/dashboard');
+      }
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to verify OTP');
     } finally {

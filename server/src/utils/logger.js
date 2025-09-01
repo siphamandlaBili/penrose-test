@@ -1,4 +1,3 @@
-// Simple logger utility: logs only in development
 const log = (...args) => {
   if (process.env.NODE_ENV === 'development') {
     // eslint-disable-next-line no-console

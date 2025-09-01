@@ -182,15 +182,6 @@ export default function Profile({ setIsAuthenticated }) {
           </div>
         </div>
       )}
-
-      <div className="mt-6">
-        <button
-          onClick={handleLogout}
-          className="flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#fa5c36] hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#fa5c36]"
-        >
-          Logout
-        </button>
-      </div>
     </div>
   );
 }

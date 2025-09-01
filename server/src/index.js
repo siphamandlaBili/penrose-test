@@ -1,8 +1,10 @@
 require('dotenv').config();
 const connectDB = require('./config/db');
 
-// Connect to MongoDB
-connectDB();
+
+
+const seedAdmin = require('./seedAdmin');
+connectDB().then(() => seedAdmin());
 
 const { log, error } = require('./utils/logger');
 const express = require('express');
@@ -18,6 +20,7 @@ const serviceRoutes = require('./routes/services');
 const subscriptionRoutes = require('./routes/subscriptions');
 const transactionRoutes = require('./routes/transactions');
 const userRoutes = require('./routes/user');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const httpServer = createServer(app);
@@ -28,25 +31,34 @@ const io = new Server(httpServer, {
   }
 });
 
-// Make io instance available to routes
+
 app.set('io', io);
 
-// Middleware
-app.use(cors({
+
+const corsOptions = {
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true
-}));
+};
+console.log('CORS config:', corsOptions);
+app.use(cors(corsOptions));
+
+app.use((req, res, next) => {
+  console.log('Incoming cookies:', req.headers.cookie);
+  next();
+});
 app.use(express.json());
 app.use(cookieParser());
 
-// Routes
+
+
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/admin', adminRoutes);
 
-// Socket.IO connection handling with authentication
+
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
   if (!token) {
@@ -65,7 +77,6 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
   log(`Client connected: ${socket.user.msisdn}`);
 
-  // Join user-specific room for targeted events
   socket.join(socket.user.msisdn);
 
   socket.on('error', (error) => {
@@ -77,12 +88,12 @@ io.on('connection', (socket) => {
   });
 });
 
-// 404 handler
+
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// Error handling middleware
+
 app.use((err, req, res, next) => {
   error(err.stack);
 
@@ -102,5 +113,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`); // Keep startup log always
+  console.log(`Server running on port ${PORT}`); 
 });
