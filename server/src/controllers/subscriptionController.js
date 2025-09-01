@@ -69,7 +69,7 @@ const subscribe = async (req, res) => {
       }
     });
   } catch (error) {
-  error('Error creating subscription:', error);
+    console.error('Error creating subscription:', error);
     res.status(500).json({ message: 'Error creating subscription', error: error.message });
   }
 };
@@ -85,7 +85,6 @@ const unsubscribe = async (req, res) => {
     // Refund transaction (record as refund)
     if (subscription && subscription.serviceId) {
       // Get service price
-      const Service = require('../models/service');
       const service = await Service.findById(subscription.serviceId);
       if (service) {
         await Transaction.createTransaction(msisdn, service._id, service.price, 'refund');
@@ -105,7 +104,7 @@ const unsubscribe = async (req, res) => {
       subscription 
     });
   } catch (error) {
-    error('Error cancelling subscription:', error);
+    console.error('Error cancelling subscription:', error);
     res.status(500).json({ 
       message: 'Error cancelling subscription',
       error: error.message 
@@ -119,7 +118,7 @@ const getUserSubscriptions = async (req, res) => {
     const subscriptions = await Subscription.getUserSubscriptions(msisdn);
     res.json(subscriptions);
   } catch (error) {
-  error('Error fetching subscriptions:', error);
+    console.error('Error fetching subscriptions:', error);
     res.status(500).json({ 
       message: 'Error fetching subscriptions',
       error: error.message
