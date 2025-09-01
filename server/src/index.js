@@ -38,7 +38,7 @@ app.set('io', io);
 
 // --- ✅ Updated CORS configuration ---
 const corsOptions = {
-  origin: [process.env.FRONTEND_URL, 'https://penrose-test-3.onrender.com'].filter(Boolean),
+  origin: [process.env.FRONTEND_URL, 'https://yesproject.netlify.app'].filter(Boolean),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
