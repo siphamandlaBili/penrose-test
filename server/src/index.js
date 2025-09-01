@@ -1,9 +1,7 @@
 require('dotenv').config();
 const connectDB = require('./config/db');
-
-
-
 const seedAdmin = require('./seedAdmin');
+
 connectDB().then(() => seedAdmin());
 
 const { log, error } = require('./utils/logger');
@@ -24,33 +22,40 @@ const adminRoutes = require('./routes/admin');
 
 const app = express();
 const httpServer = createServer(app);
+
 const io = new Server(httpServer, {
   cors: {
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials: true
-  }
+    credentials: true,
+  },
 });
-
 
 app.set('io', io);
 
-
+// --- ✅ Updated CORS configuration ---
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'https://penrose-test-eiht.vercel.app',
-  credentials: true
+  origin: [process.env.FRONTEND_URL, 'https://penrose-test-eiht.vercel.app'].filter(Boolean),
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 console.log('CORS config:', corsOptions);
-app.use(cors(corsOptions));
 
+app.use(cors(corsOptions));
+// ✅ Handle preflight safely (no "*" because of path-to-regexp crash)
+app.options(/.*/, cors(corsOptions));
+
+// Debug incoming requests
 app.use((req, res, next) => {
+  console.log('Request origin:', req.headers.origin);
   console.log('Incoming cookies:', req.headers.cookie);
   next();
 });
+
 app.use(express.json());
 app.use(cookieParser());
 
-
-
+// --- Routes ---
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
@@ -58,7 +63,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
 
-
+// --- Socket.io Authentication ---
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
   if (!token) {
@@ -79,20 +84,19 @@ io.on('connection', (socket) => {
 
   socket.join(socket.user.msisdn);
 
-  socket.on('error', (error) => {
-  error('Socket error:', error);
+  socket.on('error', (err) => {
+    error('Socket error:', err);
   });
 
   socket.on('disconnect', () => {
-  log(`Client disconnected: ${socket.user.msisdn}`);
+    log(`Client disconnected: ${socket.user.msisdn}`);
   });
 });
 
-
+// --- Error Handling ---
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
-
 
 app.use((err, req, res, next) => {
   error(err.stack);
@@ -106,12 +110,13 @@ app.use((err, req, res, next) => {
   }
 
   res.status(err.status || 500).json({
-    message: err.message || 'Something went wrong!'
+    message: err.message || 'Something went wrong!',
   });
 });
 
+// --- Server ---
 const PORT = process.env.PORT || 3000;
 
 httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`); 
+  console.log(`Server running on port ${PORT}`);
 });
