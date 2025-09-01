@@ -21,6 +21,10 @@ const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 
 const app = express();
+
+// ✅ Trust proxy so cookies and rate limit work properly behind Render/Vercel load balancer
+app.set('trust proxy', 1);
+
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
@@ -42,7 +46,6 @@ const corsOptions = {
 console.log('CORS config:', corsOptions);
 
 app.use(cors(corsOptions));
-// ✅ Handle preflight safely (no "*" because of path-to-regexp crash)
 app.options(/.*/, cors(corsOptions));
 
 // Debug incoming requests
@@ -66,9 +69,7 @@ app.use('/api/admin', adminRoutes);
 // --- Socket.io Authentication ---
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
-  if (!token) {
-    return next(new Error('Authentication error'));
-  }
+  if (!token) return next(new Error('Authentication error'));
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -81,22 +82,14 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
   log(`Client connected: ${socket.user.msisdn}`);
-
   socket.join(socket.user.msisdn);
 
-  socket.on('error', (err) => {
-    error('Socket error:', err);
-  });
-
-  socket.on('disconnect', () => {
-    log(`Client disconnected: ${socket.user.msisdn}`);
-  });
+  socket.on('error', (err) => error('Socket error:', err));
+  socket.on('disconnect', () => log(`Client disconnected: ${socket.user.msisdn}`));
 });
 
 // --- Error Handling ---
-app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-});
+app.use((req, res) => res.status(404).json({ message: 'Route not found' }));
 
 app.use((err, req, res, next) => {
   error(err.stack);
@@ -104,7 +97,6 @@ app.use((err, req, res, next) => {
   if (err.name === 'JsonWebTokenError') {
     return res.status(401).json({ message: 'Invalid token' });
   }
-
   if (err.name === 'TokenExpiredError') {
     return res.status(401).json({ message: 'Token expired' });
   }
@@ -116,7 +108,4 @@ app.use((err, req, res, next) => {
 
 // --- Server ---
 const PORT = process.env.PORT || 3000;
-
-httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`));
