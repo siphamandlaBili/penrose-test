@@ -7,6 +7,10 @@ const userSchema = new mongoose.Schema({
     unique: true,
     match: /^\d{10}$/
   },
+  name: {
+    type: String,
+    default: ''
+  },
   provider: {
     type: String,
     enum: ['vodacom', 'mtn', 'cellc', 'telkom'],

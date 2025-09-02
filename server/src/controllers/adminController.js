@@ -2,6 +2,32 @@ const Subscription = require('../models/subscription');
 const User = require('../models/user');
 const Service = require('../models/service').Service;
 
+// Get admin profile details
+const getAdminProfile = async (req, res) => {
+  try {
+    if (!req.user || !req.user.isAdmin) {
+      return res.status(403).json({ message: 'Forbidden: Admins only' });
+    }
+
+    const admin = await User.findOne({ msisdn: req.user.msisdn });
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin user not found' });
+    }
+
+    res.json({
+      msisdn: admin.msisdn,
+      name: admin.name,
+      provider: admin.provider,
+      airtime: admin.airtime,
+      isAdmin: admin.isAdmin,
+      memberSince: admin.createdAt
+    });
+  } catch (err) {
+    console.error('Error fetching admin profile:', err);
+    res.status(500).json({ message: 'Error fetching admin profile', error: err.message });
+  }
+};
+
 // Get total active users per service (admin only)
 const getActiveUsersPerService = async (req, res) => {
   console.log('ADMIN STATS: req.user:', req.user);
@@ -35,4 +61,4 @@ const getActiveUsersPerService = async (req, res) => {
   }
 };
 
-module.exports = { getActiveUsersPerService };
+module.exports = { getAdminProfile, getActiveUsersPerService };
