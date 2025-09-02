@@ -1,4 +1,5 @@
 # subscribie
+ . admin access: 0000000001 as number then use otp
 
 ## Setup Instructions
 
