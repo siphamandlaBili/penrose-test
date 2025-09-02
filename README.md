@@ -106,6 +106,13 @@
 - `GET /api/transactions`  
   Returns: `[ { _id, msisdn, serviceId, amount, type, timestamp } ]`
 
+### Admin (Admin access only)
+- `GET /api/admin/profile`  
+  Returns: `{ msisdn, name, provider, airtime, isAdmin, memberSince }`
+
+- `GET /api/admin/active-users-per-service`  
+  Returns: `[ { serviceId, serviceName, activeUserCount } ]`
+
 ---
 
 ## Notes
@@ -114,3 +121,4 @@
 - Telco billing is simulated (Vodacom/MTN selection).
 - Real-time updates via Socket.IO for subscriptions.
 - Transaction history and profile info are available in the dashboard.
+- **Admin Access**: Admin user with MSISDN `0000000001` is automatically seeded on server startup with full administrative privileges.
